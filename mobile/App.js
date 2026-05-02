@@ -1,6 +1,6 @@
 import 'react-native-url-polyfill/auto';
 import { registerRootComponent } from 'expo';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -10,6 +10,8 @@ import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { CartProvider, useCart } from './src/context/CartContext';
 import { WishlistProvider } from './src/context/WishlistContext';
 import { View, ActivityIndicator, Text } from 'react-native';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
 
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -30,6 +32,9 @@ import MyOffersScreen from './src/screens/MyOffersScreen';
 import InteriorVisualizerScreen from './src/screens/InteriorVisualizerScreen';
 
 import colors from './src/theme/colors';
+
+// Keep splash screen visible while fonts load
+SplashScreen.preventAutoHideAsync();
 
 const AppTheme = { ...DefaultTheme, dark: false, colors: { ...DefaultTheme.colors, background: colors.dark, card: colors.card, text: colors.textPrimary, border: colors.border, primary: colors.primary } };
 
@@ -141,20 +146,37 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51TDbUz22ZCvOON3CI146C9CZGl4MM3G2t1m9eKc8pU7JTM3z3etUwrXCMM0wpAa2OAym8n9bHtblwR6yTgg3v3sN00hgLtOI6c";
 
 function App() {
+  const [fontsLoaded] = useFonts({
+    ...Ionicons.font,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
-    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <NavigationContainer theme={AppTheme}>
-              <StatusBar style="dark" />
-              <RootNavigator />
-            </NavigationContainer>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
-    </StripeProvider>
+    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <NavigationContainer theme={AppTheme}>
+                <StatusBar style="dark" />
+                <RootNavigator />
+              </NavigationContainer>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </StripeProvider>
+    </View>
   );
 }
 
 registerRootComponent(App);
+

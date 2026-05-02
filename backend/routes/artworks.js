@@ -8,13 +8,21 @@ const ActivityLog = require('../models/ActivityLog');
 const { verifyToken, requireRole, optionalAuth } = require('../middleware/auth');
 const { getRuleBasedRecommendations } = require('../services/recommendationService');
 
-// Multer config
-const uploadDir = path.join(__dirname, '..', 'uploads', 'artworks');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('cloudinary').v2;
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => cb(null, Date.now() + '-' + file.originalname.replace(/\s+/g, '_')),
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'artworks',
+    allowedFormats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
 });
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } });
 
@@ -75,23 +83,31 @@ router.get('/:id', async (req, res) => {
 // Create artwork
 router.post('/', verifyToken, requireRole('ROLE_ADMIN'), upload.single('image'), async (req, res) => {
   try {
+    console.log('--- Artwork Upload ---');
+    console.log('File received:', req.file ? { path: req.file.path, filename: req.file.filename } : 'NO FILE');
+    console.log('Body:', req.body);
+    
     const { title, description, price, category, tags, stockQuantity, minStockThreshold, artistId } = req.body;
     if (parseFloat(price) <= 0) return res.status(400).json({ message: 'Price must be greater than zero.' });
     if (parseInt(stockQuantity) <= 0) return res.status(400).json({ message: 'Stock quantity must be greater than zero.' });
 
     const artwork = new Artwork({
       title, description, price: parseFloat(price), category,
-      imageUrl: req.file ? `/uploads/artworks/${req.file.filename}` : '',
+      imageUrl: req.file ? req.file.path : '',
       stockQuantity: parseInt(stockQuantity) || 1,
       minStockThreshold: parseInt(minStockThreshold) || 0,
       tags: tags ? tags.split(',').map(t => t.trim()) : [],
       artist: artistId,
     });
     const saved = await artwork.save();
+    console.log('Saved artwork imageUrl:', saved.imageUrl);
     const artist = await User.findById(artistId);
     await ActivityLog.create({ action: 'ARTWORK_UPLOAD', username: artist?.username || 'ADMIN', details: `Uploaded: ${saved.title}` });
     res.json({ message: 'Artwork uploaded successfully', id: saved._id, title: saved.title, imageUrl: saved.imageUrl });
-  } catch (e) { res.status(400).json({ message: e.message }); }
+  } catch (e) { 
+    console.error('Artwork upload error:', e);
+    res.status(400).json({ message: e.message }); 
+  }
 });
 
 // Update artwork

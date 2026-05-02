@@ -22,7 +22,10 @@
       "package": "com.artselling.mobile"
     },
     "extra": {
-      "STRIPE_PUBLISHABLE_KEY": "pk_test_51TDbUz22ZCvOON3CI146C9CZGl4MM3G2t1m9eKc8pU7JTM3z3etUwrXCMM0wpAa2OAym8n9bHtblwR6yTgg3v3sN00hgLtOI6c"
+      "STRIPE_PUBLISHABLE_KEY": "pk_test_51TDbUz22ZCvOON3CI146C9CZGl4MM3G2t1m9eKc8pU7JTM3z3etUwrXCMM0wpAa2OAym8n9bHtblwR6yTgg3v3sN00hgLtOI6c",
+      "eas": {
+        "projectId": "320ffc9a-3fad-4f55-b0e4-deeab5bf4cc3"
+      }
     },
     "plugins": [
       "expo-asset",

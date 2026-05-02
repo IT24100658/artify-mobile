@@ -1,9 +1,9 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Change this to your computer's local IP (192.168.1.177) when testing on a physical device
-const API_BASE = 'http://192.168.1.177:5000/api'; 
-// const API_BASE = 'http://10.0.2.2:5000/api'; // Use for Android emulator
+// Production API URL
+const API_BASE = 'https://artify-mobile-production.up.railway.app/api'; 
+// Local testing: const API_BASE = 'http://192.168.1.177:5000/api';
 
 const api = axios.create({ baseURL: API_BASE, timeout: 15000 });
 
