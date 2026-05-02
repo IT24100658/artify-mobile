@@ -88,10 +88,15 @@ router.put('/:id/confirm-shipment', verifyToken, requireRole('ROLE_ADMIN'), asyn
     }
     await order.save();
     await ActivityLog.create({ action: 'ORDER_CONFIRMED', username: order.user?.username || 'system', details: `Confirmed order #${order._id}` });
-    await sendOrderStatusEmail(order.user, order, 'Your shipment has been confirmed and scheduled for dispatch.');
+    if (order.user && order.user.email) {
+      await sendOrderStatusEmail(order.user, order, 'Your shipment has been confirmed and scheduled for dispatch.');
+    }
     const populated = await Order.findById(order._id).populate('items.artwork').populate('user', 'username email');
     res.json(populated);
-  } catch (e) { res.status(400).json({ message: e.message }); }
+  } catch (e) { 
+    console.error('Confirm shipment error:', e.message);
+    res.status(400).json({ message: e.message }); 
+  }
 });
 
 // Update order status
@@ -105,13 +110,16 @@ router.put('/:id/status', verifyToken, requireRole('ROLE_ADMIN'), async (req, re
     order.status = status;
     await order.save();
     await ActivityLog.create({ action: 'ORDER_STATUS_CHANGED', username: 'admin', details: `Order #${order._id} → ${status}` });
-    if (['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(status)) {
+    if (['SHIPPED', 'OUT_FOR_DELIVERY', 'DELIVERED'].includes(status) && order.user && order.user.email) {
       const msg = status === 'DELIVERED' ? 'Great news! Your masterpiece has been delivered. Enjoy!' : `Your order status has been updated to ${status}.`;
       await sendOrderStatusEmail(order.user, order, msg);
     }
     const populated = await Order.findById(order._id).populate('items.artwork').populate('user', 'username email');
     res.json(populated);
-  } catch (e) { res.status(400).json({ message: e.message }); }
+  } catch (e) { 
+    console.error('Order status update error:', e.message);
+    res.status(400).json({ message: e.message }); 
+  }
 });
 
 // Update shipping info

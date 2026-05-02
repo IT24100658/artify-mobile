@@ -105,33 +105,44 @@ export default function CheckoutScreen({ navigation }) {
   };
 
   const handleDownloadReceipt = async () => {
-    const html = `
-      <html>
-        <body style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
-          <h1 style="color: #6C63FF; text-align: center;">Artify</h1>
-          <h2 style="text-align: center;">Payment Receipt</h2>
-          <hr style="border: 1px solid #eee; margin: 20px 0;" />
-          <p><strong>Order ID:</strong> ${orderId}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
-          <p><strong>Customer Name:</strong> ${user?.username || 'Customer'}</p>
-          <p><strong>Shipping Address:</strong> ${address}</p>
-          <h3 style="margin-top: 30px;">Items Purchased:</h3>
-          <ul style="line-height: 1.6;">
-            ${receiptData.items.map(i => `<li>${i.title} - Qty: ${i.quantity} x Rs. ${i.price.toFixed(2)}</li>`).join('')}
-          </ul>
-          <hr style="border: 1px solid #eee; margin: 20px 0;" />
-          <p><strong>Subtotal:</strong> Rs. ${receiptData.total.toFixed(2)}</p>
-          <p><strong>Delivery Fee:</strong> Rs. ${deliveryFee.toFixed(2)}</p>
-          <h3 style="color: #6C63FF; font-size: 24px;"><strong>Total Paid:</strong> Rs. ${(receiptData.total + deliveryFee).toFixed(2)}</h3>
-          <p style="text-align: center; margin-top: 60px; color: #888;">Thank you for your purchase!</p>
-        </body>
-      </html>
-    `;
     try {
+      const itemsHtml = receiptData.items.map(i => {
+        const price = i.price || 0;
+        const qty = i.quantity || 1;
+        return `<li>${i.title || 'Item'} - Qty: ${qty} x Rs. ${price.toFixed(2)}</li>`;
+      }).join('');
+      const subtotal = receiptData.total || 0;
+
+      const html = `
+        <html>
+          <body style="font-family: Arial, sans-serif; padding: 40px; color: #333;">
+            <h1 style="color: #6C63FF; text-align: center;">Artify</h1>
+            <h2 style="text-align: center;">Payment Receipt</h2>
+            <hr style="border: 1px solid #eee; margin: 20px 0;" />
+            <p><strong>Order ID:</strong> ${orderId || 'N/A'}</p>
+            <p><strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
+            <p><strong>Customer Name:</strong> ${user?.username || 'Customer'}</p>
+            <p><strong>Shipping Address:</strong> ${address || 'N/A'}</p>
+            <h3 style="margin-top: 30px;">Items Purchased:</h3>
+            <ul style="line-height: 1.6;">${itemsHtml}</ul>
+            <hr style="border: 1px solid #eee; margin: 20px 0;" />
+            <p><strong>Subtotal:</strong> Rs. ${subtotal.toFixed(2)}</p>
+            <p><strong>Delivery Fee:</strong> Rs. ${deliveryFee.toFixed(2)}</p>
+            <h3 style="color: #6C63FF; font-size: 24px;"><strong>Total Paid:</strong> Rs. ${(subtotal + deliveryFee).toFixed(2)}</h3>
+            <p style="text-align: center; margin-top: 60px; color: #888;">Thank you for your purchase!</p>
+          </body>
+        </html>
+      `;
       const { uri } = await Print.printToFileAsync({ html });
-      await Sharing.shareAsync(uri);
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(uri);
+      } else {
+        await Print.printAsync({ uri });
+      }
     } catch (e) {
-      Alert.alert('Error', 'Could not generate receipt');
+      console.error('Receipt error:', e);
+      Alert.alert('Error', 'Could not generate receipt. ' + (e.message || ''));
     }
   };
 
