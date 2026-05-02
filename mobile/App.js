@@ -150,10 +150,18 @@ function App() {
     ...Ionicons.font,
   });
 
-  const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded) {
-      await SplashScreen.hideAsync();
+  React.useEffect(() => {
+    async function hideSplash() {
+      if (fontsLoaded) {
+        await SplashScreen.hideAsync();
+      }
     }
+    hideSplash();
+    // Fail-safe: hide splash after 5 seconds regardless
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync().catch(() => {});
+    }, 5000);
+    return () => clearTimeout(timer);
   }, [fontsLoaded]);
 
   if (!fontsLoaded) {
@@ -161,7 +169,7 @@ function App() {
   }
 
   return (
-    <View style={{ flex: 1 }} onLayout={onLayoutRootView}>
+    <View style={{ flex: 1 }}>
       <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <AuthProvider>
           <CartProvider>
