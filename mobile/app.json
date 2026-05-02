@@ -1,0 +1,39 @@
+{
+  "expo": {
+    "name": "Artify",
+    "slug": "artify",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#0F0F1A",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.artselling.mobile"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F0F1A"
+      },
+      "package": "com.artselling.mobile"
+    },
+    "extra": {
+      "STRIPE_PUBLISHABLE_KEY": "pk_test_51TDbUz22ZCvOON3CI146C9CZGl4MM3G2t1m9eKc8pU7JTM3z3etUwrXCMM0wpAa2OAym8n9bHtblwR6yTgg3v3sN00hgLtOI6c"
+    },
+    "plugins": [
+      "expo-asset",
+      "expo-font",
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "",
+          "enableGooglePay": false
+        }
+      ]
+    ]
+  }
+}
