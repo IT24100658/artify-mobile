@@ -72,11 +72,11 @@ export default function InteriorVisualizerScreen({ route }) {
   return (
     <View style={s.container}>
       {/* Header Area */}
-      <LinearGradient colors={['#ffffff', '#f3f4f6']} style={s.header}>
+      <LinearGradient colors={[colors.dark, colors.surface]} style={s.header}>
         <Text style={s.headerTitle}>Wall <Text style={{color: colors.primary}}>Visualizer</Text></Text>
         <Text style={s.headerSub}>Visualize "{artwork.title}" in your own space.</Text>
         <TouchableOpacity style={s.demoBtn} onPress={() => setShowDemo(true)}>
-           <Ionicons name="play-circle-outline" size={18} color={colors.textPrimary} />
+           <Ionicons name="play-circle" size={18} color="#fff" />
            <Text style={s.demoBtnText}>See Demo</Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -86,7 +86,7 @@ export default function InteriorVisualizerScreen({ route }) {
         {!bgImage ? (
           <View style={s.placeholderArea}>
             <View style={s.glassCard}>
-              <Ionicons name="image-outline" size={48} color={colors.textMuted} style={{marginBottom: 10}} />
+              <Ionicons name="image-outline" size={48} color={colors.textSecondary} style={{marginBottom: 10}} />
               <Text style={s.stepText}>Step 1: Choose a background</Text>
               
               <View style={s.btnRow}>
@@ -101,7 +101,7 @@ export default function InteriorVisualizerScreen({ route }) {
               <Text style={s.orText}>or</Text>
               
               <TouchableOpacity style={s.btnUpload} onPress={pickImage}>
-                 <Ionicons name="cloud-upload-outline" size={18} color={colors.textPrimary} />
+                 <Ionicons name="cloud-upload" size={18} color="#fff" />
                  <Text style={s.btnUploadText}>Upload Custom Photo</Text>
               </TouchableOpacity>
             </View>
@@ -131,7 +131,7 @@ export default function InteriorVisualizerScreen({ route }) {
           </View>
           <View style={s.actionRow}>
             <TouchableOpacity style={s.resetBtn} onPress={resetCanvas}>
-               <Ionicons name="refresh-outline" size={16} color={colors.textPrimary} />
+               <Ionicons name="refresh" size={16} color="#fff" />
                <Text style={s.resetBtnText}>Reset Canvas</Text>
             </TouchableOpacity>
           </View>
@@ -164,35 +164,35 @@ const s = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.dark },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.dark },
   header: { padding: 20, alignItems: 'center', paddingBottom: 30 },
-  headerTitle: { fontSize: 28, fontWeight: '900', color: colors.textPrimary },
-  headerSub: { fontSize: 14, color: colors.textMuted, marginTop: 4, marginBottom: 16 },
-  demoBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 6, shadowColor: '#000', shadowOffset: {width: 0, height: 2}, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
-  demoBtnText: { fontWeight: '700', color: colors.textPrimary, fontSize: 13 },
-  mainArea: { flex: 1, backgroundColor: '#e2e8f0' },
+  headerTitle: { fontSize: 28, fontWeight: '900', color: '#fff' },
+  headerSub: { fontSize: 14, color: colors.textSecondary, marginTop: 4, marginBottom: 16 },
+  demoBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, gap: 6, borderWidth: 1, borderColor: colors.border },
+  demoBtnText: { fontWeight: '700', color: '#fff', fontSize: 13 },
+  mainArea: { flex: 1, backgroundColor: '#000' },
   placeholderArea: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  glassCard: { width: '100%', backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 24, padding: 30, alignItems: 'center', shadowColor: '#000', shadowOffset: {width: 0, height: 10}, shadowOpacity: 0.05, shadowRadius: 20, elevation: 5 },
+  glassCard: { width: '100%', backgroundColor: colors.surface, borderRadius: 24, padding: 30, alignItems: 'center', borderWidth: 1, borderColor: colors.border },
   stepText: { fontSize: 16, fontWeight: '700', color: colors.textPrimary, marginBottom: 20 },
   btnRow: { flexDirection: 'row', gap: 10 },
   btnTemplate: { backgroundColor: colors.primary, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, flex: 1, alignItems: 'center' },
   btnTemplateText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   orText: { color: colors.textMuted, marginVertical: 15, fontSize: 14 },
-  btnUpload: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, borderWidth: 1, borderColor: '#d1d5db', gap: 8, width: '100%', justifyContent: 'center' },
-  btnUploadText: { color: colors.textPrimary, fontWeight: '700', fontSize: 14 },
+  btnUpload: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.border, gap: 8, width: '100%', justifyContent: 'center' },
+  btnUploadText: { color: '#fff', fontWeight: '700', fontSize: 14 },
   room: { flex: 1, overflow: 'hidden', position: 'relative' },
   bgImageFull: { width: '100%', height: '100%' },
   artworkWrap: { position: 'absolute', zIndex: 10, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8, elevation: 10 },
   artImage: { width: '100%', height: '100%', borderRadius: 2 },
   frame: { position: 'absolute', top: -4, left: -4, right: -4, bottom: -4, borderWidth: 4, borderColor: '#3E2723', borderRadius: 2 },
-  controls: { backgroundColor: colors.surface, padding: 16, paddingBottom: 30, borderTopLeftRadius: 24, borderTopRightRadius: 24, shadowColor: '#000', shadowOffset: {width: 0, height: -5}, shadowOpacity: 0.05, shadowRadius: 10, elevation: 10 },
-  hint: { color: colors.textMuted, fontSize: 13, textAlign: 'center', marginBottom: 12, fontWeight: '600' },
+  controls: { backgroundColor: colors.surface, padding: 16, paddingBottom: 30, borderTopLeftRadius: 24, borderTopRightRadius: 24, borderWidth: 1, borderColor: colors.border },
+  hint: { color: colors.textSecondary, fontSize: 13, textAlign: 'center', marginBottom: 12, fontWeight: '600' },
   sizeRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 20 },
   sizeLabel: { color: colors.textSecondary, fontSize: 13, fontWeight: '700' },
-  sizeBtn: { backgroundColor: '#f1f5f9', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: colors.border },
+  sizeBtn: { backgroundColor: colors.dark, paddingHorizontal: 16, paddingVertical: 8, borderRadius: 10, borderWidth: 1, borderColor: colors.border },
   sizeBtnActive: { backgroundColor: colors.primary, borderColor: colors.primary },
   sizeBtnText: { color: colors.textSecondary, fontWeight: '700' },
   actionRow: { flexDirection: 'row', justifyContent: 'center' },
-  resetBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#f1f5f9', paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12 },
-  resetBtnText: { color: colors.textPrimary, fontWeight: '700' },
+  resetBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.dark, paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, borderWidth: 1, borderColor: colors.border },
+  resetBtnText: { color: '#fff', fontWeight: '700' },
   modalBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.9)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { width: '100%', height: 300, position: 'relative' },
   closeBtn: { position: 'absolute', top: -40, right: 20, zIndex: 100, padding: 10 },
