@@ -3,7 +3,8 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, ActivityIndi
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../theme/colors';
 import ArtworkService from '../services/artwork.service';
-const API_BASE = 'http://192.168.1.177:5000';
+import config from '../config';
+const API_BASE = config.BASE_URL;
 
 export default function InventoryScreen({ navigation }) {
   const [artworks, setArtworks] = useState([]);

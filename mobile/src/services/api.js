@@ -1,11 +1,8 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import config from '../config';
 
-// Production API URL
-const API_BASE = 'https://artify-mobile-production.up.railway.app/api'; 
-// Local testing: const API_BASE = 'http://192.168.1.177:5000/api';
-
-const api = axios.create({ baseURL: API_BASE, timeout: 15000 });
+const api = axios.create({ baseURL: config.API_URL, timeout: 15000 });
 
 api.interceptors.request.use(async (config) => {
   try {

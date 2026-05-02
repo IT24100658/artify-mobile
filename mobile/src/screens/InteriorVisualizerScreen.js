@@ -6,9 +6,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../theme/colors';
 import ArtworkService from '../services/artwork.service';
+import config from '../config';
 
 const { width, height } = Dimensions.get('window');
-const API_BASE = 'http://192.168.1.177:5000';
+const API_BASE = config.BASE_URL;
 
 const TEMPLATE_1 = require('../../assets/living_room_1.jpeg');
 const TEMPLATE_2 = require('../../assets/living_room_2.png');

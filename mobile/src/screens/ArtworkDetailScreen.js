@@ -11,9 +11,10 @@ import OfferService from '../services/offer.service';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import config from '../config';
 
 const { width } = Dimensions.get('window');
-const API_BASE = 'http://192.168.1.177:5000';
+const API_BASE = config.BASE_URL;
 
 export default function ArtworkDetailScreen({ route, navigation }) {
   const { id } = route.params;

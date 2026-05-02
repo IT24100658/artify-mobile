@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, FlatList } from 'react-native';
 import colors from '../theme/colors';
 import StarRating from './StarRating';
+import config from '../config';
 
-const API_BASE = 'http://192.168.1.177:5000';
+const API_BASE = config.BASE_URL;
 
 const ReviewList = ({ reviews, currentUser, onEditReview, onDeleteReview }) => {
   if (!reviews?.length) {

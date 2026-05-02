@@ -3,10 +3,11 @@ import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'rea
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../theme/colors';
 import StarRating from './StarRating';
+import config from '../config';
 
 const { width } = Dimensions.get('window');
 const CARD_WIDTH = (width - 48) / 2;
-const API_BASE = 'http://192.168.1.177:5000';
+const API_BASE = config.BASE_URL;
 
 const ArtworkCard = ({ artwork, onPress, onAddToCart, onAddToWishlist, showActions = true }) => {
   const imageUri = artwork.imageUrl?.startsWith('http') ? artwork.imageUrl : `${API_BASE}${artwork.imageUrl}`;

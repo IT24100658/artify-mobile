@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import colors from '../theme/colors';
 import { useCart } from '../context/CartContext';
-const API_BASE = 'http://192.168.1.177:5000';
+import config from '../config';
+const API_BASE = config.BASE_URL;
 
 export default function CartScreen({ navigation }) {
   const { cart, removeFromCart, updateQuantity, cartTotal, cartCount } = useCart();

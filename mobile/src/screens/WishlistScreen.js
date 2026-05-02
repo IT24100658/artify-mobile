@@ -3,7 +3,8 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, 
 import { Ionicons } from '@expo/vector-icons';
 import colors from '../theme/colors';
 import { useWishlist } from '../context/WishlistContext';
-const API_BASE = 'http://192.168.1.177:5000';
+import config from '../config';
+const API_BASE = config.BASE_URL;
 
 export default function WishlistScreen({ navigation }) {
   const { wishlist, removeFromWishlist, moveToCart } = useWishlist();
