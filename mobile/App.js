@@ -12,6 +12,7 @@ import { WishlistProvider } from './src/context/WishlistContext';
 import { View, ActivityIndicator, Text } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import HomeScreen from './src/screens/HomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
@@ -36,12 +37,28 @@ import colors from './src/theme/colors';
 // Keep splash screen visible while fonts load
 SplashScreen.preventAutoHideAsync();
 
-const AppTheme = { ...DefaultTheme, dark: false, colors: { ...DefaultTheme.colors, background: colors.dark, card: colors.card, text: colors.textPrimary, border: colors.border, primary: colors.primary } };
+const AppTheme = { 
+  ...DefaultTheme, 
+  dark: true, 
+  colors: { 
+    ...DefaultTheme.colors, 
+    background: colors.dark, 
+    card: colors.card, 
+    text: colors.textPrimary, 
+    border: colors.border, 
+    primary: colors.primary 
+  } 
+};
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const screenOptions = { headerStyle: { backgroundColor: colors.card }, headerTintColor: colors.textPrimary, headerTitleStyle: { fontWeight: '700' }, contentStyle: { backgroundColor: colors.dark } };
+const screenOptions = { 
+  headerStyle: { backgroundColor: colors.card }, 
+  headerTintColor: colors.textPrimary, 
+  headerTitleStyle: { fontWeight: '700' }, 
+  contentStyle: { backgroundColor: colors.dark } 
+};
 
 function HomeStack() {
   return (<Stack.Navigator screenOptions={screenOptions}>
@@ -137,7 +154,12 @@ function AdminTabs() {
 
 function RootNavigator() {
   const { user, loading, isAdmin } = useAuth();
-  if (loading) return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.dark }}><ActivityIndicator size="large" color={colors.primary} /></View>;
+  if (loading) return (
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.dark }}>
+      <ActivityIndicator size="large" color={colors.primary} />
+      <Text style={{ color: colors.textSecondary, marginTop: 10, fontWeight: '600' }}>Loading Artify...</Text>
+    </View>
+  );
   return user ? (isAdmin ? <AdminTabs /> : <MainTabs />) : <AuthStack />;
 }
 
@@ -146,43 +168,52 @@ import { StripeProvider } from '@stripe/stripe-react-native';
 const STRIPE_PUBLISHABLE_KEY = "pk_test_51TDbUz22ZCvOON3CI146C9CZGl4MM3G2t1m9eKc8pU7JTM3z3etUwrXCMM0wpAa2OAym8n9bHtblwR6yTgg3v3sN00hgLtOI6c";
 
 function App() {
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     ...Ionicons.font,
   });
 
   React.useEffect(() => {
     async function hideSplash() {
-      if (fontsLoaded) {
+      if (fontsLoaded || fontError) {
         await SplashScreen.hideAsync();
       }
     }
     hideSplash();
-    // Fail-safe: hide splash after 5 seconds regardless
     const timer = setTimeout(() => {
       SplashScreen.hideAsync().catch(() => {});
     }, 5000);
     return () => clearTimeout(timer);
-  }, [fontsLoaded]);
+  }, [fontsLoaded, fontError]);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && !fontError) {
     return null;
   }
 
+  if (fontError) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#0F0F1A' }}>
+        <Text style={{ color: '#fff' }}>Failed to load fonts: {fontError.message}</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={{ flex: 1 }}>
-      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
-        <AuthProvider>
-          <CartProvider>
-            <WishlistProvider>
-              <NavigationContainer theme={AppTheme}>
-                <StatusBar style="dark" />
-                <RootNavigator />
-              </NavigationContainer>
-            </WishlistProvider>
-          </CartProvider>
-        </AuthProvider>
-      </StripeProvider>
-    </View>
+    <SafeAreaProvider>
+      <View style={{ flex: 1 }}>
+        <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
+          <AuthProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <NavigationContainer theme={AppTheme}>
+                  <StatusBar style="dark" />
+                  <RootNavigator />
+                </NavigationContainer>
+              </WishlistProvider>
+            </CartProvider>
+          </AuthProvider>
+        </StripeProvider>
+      </View>
+    </SafeAreaProvider>
   );
 }
 
