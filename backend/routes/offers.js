@@ -46,21 +46,36 @@ const { sendOfferStatusEmail } = require('../services/emailService');
 router.put('/:id/status', verifyToken, requireRole('ROLE_ADMIN'), async (req, res) => {
   try {
     const status = req.query.status || req.body.status;
+    if (!status) return res.status(400).json({ message: 'Status is required' });
+    
     const offer = await Offer.findById(req.params.id).populate('artwork').populate('customer');
     if (!offer) return res.status(404).json({ message: 'Offer not found' });
+    
     offer.status = status;
     await offer.save();
-    const action = status === 'ACCEPTED' ? 'SALE' : 'OFFER_UPDATE';
-    await ActivityLog.create({ action, username: 'ADMIN', details: `Offer ${status} for: ${offer.artwork?.title}` });
     
-    // Send email notification
+    console.log(`Offer ${req.params.id} updated to ${status}`);
+    
+    const action = status === 'ACCEPTED' ? 'SALE' : 'OFFER_UPDATE';
+    await ActivityLog.create({ 
+      action, 
+      username: 'ADMIN', 
+      details: `Offer ${status} for: ${offer.artwork?.title || 'Unknown artwork'}` 
+    });
+    
+    // Send email notification (async, non-blocking)
     const msg = status === 'ACCEPTED' 
       ? 'Great news! Your offer has been accepted by the admin. You can now proceed to Buy Now with your requested price.' 
       : `Your offer has been updated to ${status}.`;
-    await sendOfferStatusEmail(offer.customer, offer, msg);
     
-    res.json({ message: 'Offer updated' });
-  } catch (e) { res.status(400).json({ message: e.message }); }
+    sendOfferStatusEmail(offer.customer, offer, msg).catch(err => console.error('Email error:', err));
+    
+    const populated = await Offer.findById(offer._id).populate('artwork').populate('customer', 'username email').populate('artist', 'username');
+    res.json(populated);
+  } catch (e) { 
+    console.error('Offer update error:', e.message);
+    res.status(400).json({ message: e.message }); 
+  }
 });
 
 module.exports = router;

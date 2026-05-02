@@ -1,37 +1,41 @@
 const nodemailer = require('nodemailer');
 
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.EMAIL_PORT) || 587,
-  secure: false,
-  auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
-});
+let transporter = null;
 
-// Verify email connection on startup
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('❌ Email service error:', error.message);
-    console.error('   EMAIL_USER:', process.env.EMAIL_USER ? '✓ set' : '✗ MISSING');
-    console.error('   EMAIL_PASS:', process.env.EMAIL_PASS ? '✓ set' : '✗ MISSING');
-  } else {
-    console.log('✅ Email service ready -', process.env.EMAIL_USER);
-  }
-});
+if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+  transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT) || 587,
+    secure: false,
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+
+  transporter.verify((error) => {
+    if (error) {
+      console.error('❌ Email service verification failed:', error.message);
+      transporter = null; // Disable if verification fails
+    } else {
+      console.log('✅ Email service ready -', process.env.EMAIL_USER);
+    }
+  });
+} else {
+  console.log('⚠️ Email credentials missing - Email service disabled');
+}
 
 const sendOrderStatusEmail = async (user, order, customMessage) => {
   try {
-    if (!user.email) {
-      console.log('No email address for user');
+    if (!transporter) {
+      console.log('ℹ️ Email service not active - skipping order email');
       return;
     }
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('❌ Email credentials not configured - skipping email');
+    if (!user || !user.email) {
+      console.log('❌ Skipping email: User or email address is missing');
       return;
     }
     const estDelivery = order.shippingDetails?.estimatedDeliveryDate
       ? new Date(order.shippingDetails.estimatedDeliveryDate).toLocaleDateString()
       : 'Not scheduled yet';
-    const text = `Dear ${user.username},\n\nYour order #${order._id} has been updated.\n\nNew Status: ${order.status}\nEstimated Delivery Date: ${estDelivery}\nDelivery Fee: Rs.${order.deliveryFee || 0}\n\n${customMessage}\n\nThank you for curating with ArtSelling!\n`;
+    const text = `Dear ${user.username || 'Customer'},\n\nYour order #${order._id} has been updated.\n\nNew Status: ${order.status}\nEstimated Delivery Date: ${estDelivery}\nDelivery Fee: Rs.${order.deliveryFee || 0}\n\n${customMessage}\n\nThank you for curating with ArtSelling!\n`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: user.email,
@@ -46,12 +50,15 @@ const sendOrderStatusEmail = async (user, order, customMessage) => {
 
 const sendOfferStatusEmail = async (user, offer, customMessage) => {
   try {
-    if (!user.email) return;
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      console.error('❌ Email credentials not configured - skipping email');
+    if (!transporter) {
+      console.log('ℹ️ Email service not active - skipping offer email');
       return;
     }
-    const text = `Dear ${user.username},\n\nYour offer for artwork "${offer.artwork?.title}" has been updated.\n\nNew Status: ${offer.status}\nOffered Price: Rs.${offer.offeringPrice}\n\n${customMessage}\n\nThank you for curating with ArtSelling!\n`;
+    if (!user || !user.email) {
+      console.log('❌ Skipping email: User or email address is missing');
+      return;
+    }
+    const text = `Dear ${user.username || 'Customer'},\n\nYour offer for artwork "${offer.artwork?.title || 'Art piece'}" has been updated.\n\nNew Status: ${offer.status}\nOffered Price: Rs.${offer.offeringPrice}\n\n${customMessage}\n\nThank you for curating with ArtSelling!\n`;
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: user.email,
