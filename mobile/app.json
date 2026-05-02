@@ -30,9 +30,6 @@
     "plugins": [
       "expo-asset",
       "expo-font",
-      "expo-print",
-      "expo-sharing",
-      "expo-image-picker",
       [
         "@stripe/stripe-react-native",
         {
