@@ -28,7 +28,9 @@ app.use('/api/payment', require('./routes/payment'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/reservations', require('./routes/reservations'));
 
-// Health check
+// Status routes
+app.get('/', (req, res) => res.send('Backend server is working!'));
+app.get('/api', (req, res) => res.send('Backend server is working!'));
 app.get('/api/health', (req, res) => res.json({ status: 'OK' }));
 
 // Start reservation cleanup
