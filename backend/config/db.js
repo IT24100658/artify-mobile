@@ -32,11 +32,15 @@ const connectDB = async () => {
       });
       console.log('Admin user created successfully!');
     } else {
-      // Reset admin password on every start
+      // Reset admin password and ensure active on every start
       const hashedPassword = await bcrypt.hash('admin123', 10);
       adminExists.password = hashedPassword;
+      adminExists.active = true;
+      if (!adminExists.roles.includes('ROLE_ADMIN')) {
+        adminExists.roles = ['ROLE_ADMIN'];
+      }
       await adminExists.save();
-      console.log('Admin user credentials re-initialized!');
+      console.log('Admin user credentials re-initialized (admin/admin123)!');
     }
   } catch (error) {
     console.error(`MongoDB Error: ${error.message}`);
