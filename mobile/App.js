@@ -132,6 +132,13 @@ function AuthStack() {
   </Stack.Navigator>);
 }
 
+function InventoryStack() {
+  return (<Stack.Navigator screenOptions={screenOptions}>
+    <Stack.Screen name="InventoryMain" component={InventoryScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="EditArtwork" component={EditArtworkScreen} options={{ title: 'Edit Artwork' }} />
+  </Stack.Navigator>);
+}
+
 function AdminTabs() {
   return (
     <Tab.Navigator screenOptions={({ route }) => ({
@@ -146,7 +153,7 @@ function AdminTabs() {
     })}>
       <Tab.Screen name="DashboardTab" component={AdminDashboardScreen} options={{ title: 'Dashboard' }} />
       <Tab.Screen name="CatalogTab" component={CatalogStack} options={{ title: 'Catalog' }} />
-      <Tab.Screen name="InventoryTab" component={InventoryScreen} options={{ title: 'Inventory' }} />
+      <Tab.Screen name="InventoryTab" component={InventoryStack} options={{ title: 'Inventory' }} />
       <Tab.Screen name="ProfileTab" component={ProfileStack} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );
