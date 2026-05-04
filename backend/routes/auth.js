@@ -37,6 +37,13 @@ router.post('/signup', async (req, res) => {
   try {
     const { username, email, password, address, phone, role } = req.body;
 
+    if (!email || !email.includes('@')) {
+      return res.status(400).json({ message: 'Error: Invalid email address!' });
+    }
+    if (!phone || phone.length !== 10 || !/^\d+$/.test(phone)) {
+      return res.status(400).json({ message: 'Error: Phone number must be exactly 10 digits!' });
+    }
+
     if (await User.findOne({ username })) {
       return res.status(400).json({ message: 'Error: Username is already taken!' });
     }

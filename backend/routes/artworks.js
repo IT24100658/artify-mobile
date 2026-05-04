@@ -88,8 +88,17 @@ router.post('/', verifyToken, requireRole('ROLE_ADMIN'), upload.single('image'),
     console.log('Body:', req.body);
     
     const { title, description, price, category, tags, stockQuantity, minStockThreshold, artistId } = req.body;
+    
+    // Required fields check
+    if (!title || !description || !price || !category || !tags || !stockQuantity || !minStockThreshold || !artistId || !req.file) {
+      return res.status(400).json({ message: 'All fields are required, including an image.' });
+    }
+
     if (parseFloat(price) <= 0) return res.status(400).json({ message: 'Price must be greater than zero.' });
     if (parseInt(stockQuantity) <= 0) return res.status(400).json({ message: 'Stock quantity must be greater than zero.' });
+    if (parseInt(minStockThreshold) > parseInt(stockQuantity)) {
+      return res.status(400).json({ message: 'Min stock threshold cannot be higher than stock quantity.' });
+    }
 
     const artwork = new Artwork({
       title, description, price: parseFloat(price), category,

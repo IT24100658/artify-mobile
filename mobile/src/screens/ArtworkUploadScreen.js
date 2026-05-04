@@ -20,13 +20,28 @@ export default function ArtworkUploadScreen({ navigation }) {
   };
 
   const handleUpload = async () => {
-    if (!form.title || !form.price || !image) { Alert.alert('Error', 'Please fill required fields and select an image'); return; }
+    // All fields required check
+    if (!form.title || !form.description || !form.price || !form.category || !form.tags || !form.stockQuantity || !form.minStockThreshold || !image) {
+      Alert.alert('Error', 'Please fill all fields and select an image');
+      return;
+    }
+
+    // Min threshold check
+    if (parseInt(form.minStockThreshold) > parseInt(form.stockQuantity)) {
+      Alert.alert('Error', 'Min stock threshold cannot be higher than stock quantity');
+      return;
+    }
+
     setLoading(true);
     try {
       const fd = new FormData();
-      fd.append('title', form.title); fd.append('description', form.description); fd.append('price', form.price);
-      fd.append('category', form.category); fd.append('tags', form.tags);
-      fd.append('stockQuantity', form.stockQuantity); fd.append('minStockThreshold', form.minStockThreshold);
+      fd.append('title', form.title); 
+      fd.append('description', form.description); 
+      fd.append('price', form.price);
+      fd.append('category', form.category); 
+      fd.append('tags', form.tags);
+      fd.append('stockQuantity', form.stockQuantity); 
+      fd.append('minStockThreshold', form.minStockThreshold);
       fd.append('artistId', user.id);
       fd.append('image', { uri: image.uri, name: 'artwork.jpg', type: 'image/jpeg' });
       await ArtworkService.createArtwork(fd);
@@ -44,8 +59,8 @@ export default function ArtworkUploadScreen({ navigation }) {
         {image ? <Image source={{ uri: image.uri }} style={s.preview} /> :
           <><Ionicons name="image-outline" size={48} color={colors.textMuted} /><Text style={s.pickText}>Select Image *</Text></>}
       </TouchableOpacity>
-      {[{ k: 'title', ph: 'Title *' }, { k: 'description', ph: 'Description', multi: true }, { k: 'price', ph: 'Price (Rs.) *', kb: 'numeric' },
-        { k: 'tags', ph: 'Tags (comma separated)' }, { k: 'stockQuantity', ph: 'Stock Quantity', kb: 'numeric' }, { k: 'minStockThreshold', ph: 'Min Stock Threshold', kb: 'numeric' }].map(f => (
+      {[{ k: 'title', ph: 'Title *' }, { k: 'description', ph: 'Description *', multi: true }, { k: 'price', ph: 'Price (Rs.) *', kb: 'numeric' },
+        { k: 'tags', ph: 'Tags (comma separated) *' }, { k: 'stockQuantity', ph: 'Stock Quantity *', kb: 'numeric' }, { k: 'minStockThreshold', ph: 'Min Stock Threshold *', kb: 'numeric' }].map(f => (
         <TextInput key={f.k} style={[s.input, f.multi && { minHeight: 80, textAlignVertical: 'top' }]} value={form[f.k]} onChangeText={v => update(f.k, v)} placeholder={f.ph} placeholderTextColor={colors.textMuted} keyboardType={f.kb || 'default'} multiline={f.multi} />
       ))}
       <Text style={s.label}>Category</Text>

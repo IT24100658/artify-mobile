@@ -12,7 +12,9 @@ export default function RegisterScreen({ navigation }) {
   const update = (key, val) => setForm(p => ({ ...p, [key]: val }));
 
   const handleRegister = async () => {
-    if (!form.username || !form.email || !form.password) { Alert.alert('Error', 'Please fill required fields'); return; }
+    if (!form.username || !form.email || !form.password || !form.phone) { Alert.alert('Error', 'Please fill required fields'); return; }
+    if (!form.email.includes('@')) { Alert.alert('Error', 'Invalid email address'); return; }
+    if (form.phone.length !== 10 || !/^\d+$/.test(form.phone)) { Alert.alert('Error', 'Phone number must be exactly 10 digits'); return; }
     if (form.password !== form.confirmPassword) { Alert.alert('Error', 'Passwords do not match'); return; }
     if (form.password.length < 6) { Alert.alert('Error', 'Password must be at least 6 characters'); return; }
     setLoading(true);
@@ -39,7 +41,7 @@ export default function RegisterScreen({ navigation }) {
         <View style={styles.form}>
           {[{ key: 'username', icon: 'person-outline', ph: 'Username *' }, { key: 'email', icon: 'mail-outline', ph: 'Email *', kb: 'email-address' },
             { key: 'password', icon: 'lock-closed-outline', ph: 'Password *', secure: true }, { key: 'confirmPassword', icon: 'lock-closed-outline', ph: 'Confirm Password *', secure: true },
-            { key: 'address', icon: 'location-outline', ph: 'Address' }, { key: 'phone', icon: 'call-outline', ph: 'Phone', kb: 'phone-pad' }].map(f => (
+            { key: 'address', icon: 'location-outline', ph: 'Address' }, { key: 'phone', icon: 'call-outline', ph: 'Phone *', kb: 'phone-pad' }].map(f => (
             <View key={f.key} style={styles.inputWrap}>
               <Ionicons name={f.icon} size={20} color={colors.textMuted} />
               <TextInput style={styles.input} value={form[f.key]} onChangeText={v => update(f.key, v)} placeholder={f.ph} placeholderTextColor={colors.textMuted} secureTextEntry={f.secure} keyboardType={f.kb || 'default'} autoCapitalize="none" />
